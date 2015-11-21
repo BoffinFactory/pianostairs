@@ -1,0 +1,199 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:pianostairs-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L +5V #PWR01
+U 1 1 564F8C4F
+P 3700 2250
+F 0 "#PWR01" H 3700 2100 50  0001 C CNN
+F 1 "+5V" H 3700 2390 50  0000 C CNN
+F 2 "" H 3700 2250 60  0000 C CNN
+F 3 "" H 3700 2250 60  0000 C CNN
+	1    3700 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L LM393 U1
+U 1 1 564F8D78
+P 4350 2650
+F 0 "U1" H 4500 2800 60  0000 C CNN
+F 1 "LM393" H 4550 2450 60  0000 C CNN
+F 2 "Housings_SSOP:MSOP-8-1EP_3x3mm_Pitch0.65mm" H 4350 2650 60  0001 C CNN
+F 3 "" H 4350 2650 60  0000 C CNN
+	1    4350 2650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Earth #PWR02
+U 1 1 564F8E27
+P 4250 4000
+F 0 "#PWR02" H 4250 3750 50  0001 C CNN
+F 1 "Earth" H 4250 3850 50  0001 C CNN
+F 2 "" H 4250 4000 60  0000 C CNN
+F 3 "" H 4250 4000 60  0000 C CNN
+	1    4250 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 2250 5550 2250
+$Comp
+L POT RV1
+U 1 1 564F8EEE
+P 3200 2550
+F 0 "RV1" H 3200 2450 50  0000 C CNN
+F 1 "POT" H 3200 2550 50  0000 C CNN
+F 2 "3361P-104GLFCT-ND:3361P Bourns trimming Potentiometer" H 3200 2550 60  0001 C CNN
+F 3 "" H 3200 2550 60  0000 C CNN
+	1    3200 2550
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3200 2300 3200 2250
+Connection ~ 3700 2250
+Wire Wire Line
+	3350 2550 3850 2550
+Wire Wire Line
+	3100 3200 5700 3200
+Wire Wire Line
+	3200 3200 3200 2800
+Connection ~ 4250 3200
+$Comp
+L LED D1
+U 1 1 564F92B7
+P 5400 2650
+F 0 "D1" H 5400 2750 50  0000 C CNN
+F 1 "LED" H 5400 2550 50  0000 C CNN
+F 2 "LEDs:LED-0805" H 5400 2650 60  0001 C CNN
+F 3 "" H 5400 2650 60  0000 C CNN
+	1    5400 2650
+	-1   0    0    1   
+$EndComp
+$Comp
+L R R3
+U 1 1 564F9325
+P 5000 2650
+F 0 "R3" V 5080 2650 50  0000 C CNN
+F 1 "R" V 5000 2650 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4930 2650 30  0001 C CNN
+F 3 "" H 5000 2650 30  0000 C CNN
+	1    5000 2650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5200 2650 5150 2650
+Wire Wire Line
+	5600 3200 5600 2650
+Wire Wire Line
+	4750 2650 4750 2350
+Wire Wire Line
+	4750 2350 5600 2350
+$Comp
+L Photores R1
+U 1 1 564F95F1
+P 2650 2550
+F 0 "R1" V 2730 2550 50  0000 C CNN
+F 1 "Photores" V 2860 2550 50  0000 C TNN
+F 2 "LEDs:LED-0805" V 2580 2550 30  0001 C CNN
+F 3 "" H 2650 2550 30  0000 C CNN
+	1    2650 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R2
+U 1 1 564F9658
+P 2650 2950
+F 0 "R2" V 2730 2950 50  0000 C CNN
+F 1 "R" V 2650 2950 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 2580 2950 30  0001 C CNN
+F 3 "" H 2650 2950 30  0000 C CNN
+	1    2650 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 2250 2650 2300
+Connection ~ 3200 2250
+Wire Wire Line
+	2650 3100 3100 3100
+Wire Wire Line
+	3100 3100 3100 3200
+Connection ~ 3200 3200
+Wire Wire Line
+	2650 2800 2950 2800
+Wire Wire Line
+	2950 2800 2950 2850
+Wire Wire Line
+	2950 2850 3700 2850
+Wire Wire Line
+	3700 2850 3700 2750
+Wire Wire Line
+	3700 2750 3850 2750
+Wire Wire Line
+	5600 2350 5600 2200
+Wire Wire Line
+	5600 2200 6200 2200
+Wire Wire Line
+	4250 3050 4250 4000
+$Comp
+L CONN_01X03 P1
+U 1 1 564F9E0D
+P 6400 2200
+F 0 "P1" H 6400 2400 50  0000 C CNN
+F 1 "CONN_01X03" V 6500 2200 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Angled_1x03" H 6400 2200 60  0001 C CNN
+F 3 "" H 6400 2200 60  0000 C CNN
+	1    6400 2200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 2250 5550 2100
+Wire Wire Line
+	5550 2100 6200 2100
+Connection ~ 4250 2250
+Wire Wire Line
+	5700 3200 5700 2300
+Wire Wire Line
+	5700 2300 6200 2300
+Connection ~ 5600 3200
+$EndSCHEMATC
