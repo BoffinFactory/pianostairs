@@ -1,106 +1,139 @@
-import pygame, itertools, collections
+import pygame, itertools, collections, sys
 
 # Constants
 NSTAIRS = 36
+SOUNDS_DIR = 'sounds'
+DEBUG = 1
 
-instrument='piano'
-notes=[] # TODO: initialize to something
-power=1 # if 0, nothing runs
+# Globals. Don't modify these directly.  set_(key|instrument) and power_(on|off) run additional checks and/or do stuff.
+g_instrument = 'piano'
+g_notes = []
+g_power = 1 # if 0, nothing runs
 
-# return a sound object based on the current instrument, as well as what note stair_num is connected to
-def get_sound(stair_num):
-	#TODO: notes needs to be a list containing things like 'C4', 'Bb2', etc
-	#fname must exist.
-	global instrument
-	global notes
-	fname=instrument + '-' + notes[stair_num] + '.wav'
-	#TODO: verify that fname exists.  This should be a can't happen condition if the config functions check their args correctly.
-	print("start %s" % (fname))
-	return pygame.mixer.Sound(fname)
-	pass
+
+# Output functions.  Depending on the physical interface, I might want these doing different things
+def output(s):
+	print s
+
+def error(s):
+	print "ERROR: " + s
+
+def debug(s):
+	global DEBUG
+	if DEBUG: print "DEBUG: " + s
+
+
+def get_sound_file(instrument, note)
+	return SOUNDS_DIR + '/' + instrument + '-' + note + '.wav'
 
 def stair_down(stair_num):
-	global power
-	if not power: return
+	global g_power, g_notes
+	
+	if not g_power: return
+
 	channel = pygame.mixer.Channel(stair_num)
-	channel.play(get_sound(stair_num))
-	print("on channel %d\n" % (stair_num))
-	pass
+	fname = get_sound_file(g_instrument, g_notes[stair_num])
+
+	channel.play(pygame.mixer.Sound(fname))
+	debug("start %s on channel %d\n" % (fname, stair_num))
 
 def stair_up(stair_num):
 	channel = pygame.mixer.Channel(stair_num)
-	print("stop channel %d\n" % (stair_num))
 	channel.stop()
-	pass
+	debug("stop channel %d\n" % (stair_num))
+
 
 #key is the *major* key it's in.  It'll be centered on that note in octave 4
 def set_key(key, include_accidentals):
-	global notes, NSTAIRS
+	global g_notes, NSTAIRS
 
-	arr = [ "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" ]
+	arr = [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B' ]
+
+	if key not in arr:
+		error("key %s is invalid.  Select one of %s" % (key, arr))
+		return -1
+
 	basenotes = collections.deque(arr)
 	basenotes.rotate(12 - arr.index(key))
 
 	# 8 is just an upper bound. Beyond that, we can't center on C4 and the assertions will fail
 	# But since outside that range is basically outside human hearing...
-	arr = ["%s%d" % (note,octave) 
+	notes = ["%s%d" % (note,octave) 
 		for (i, (octave,note)) in enumerate(itertools.product(range(0, 8), basenotes)) 
 		if include_accidentals or (i % 12 not in [ 1, 3, 6, 8, 10 ]) # filter accidentals
 	]
 
-	#Center on octave 4
-	center = arr.index(key + "4")
+	# Center on octave 4
+	center = notes.index(key + '4')
 	min = center - NSTAIRS / 2
 
-	assert min >= 0 and len(arr) >= NSTAIRS
-	notes = arr[min : NSTAIRS + min]
-	assert len(notes) == NSTAIRS
+	# Reduce to NSTAIRS notes
+	assert min >= 0 and len(notes) >= NSTAIRS
+	g_notes = notes[min : NSTAIRS + min]
+	assert len(g_notes) == NSTAIRS
 
-	print key
-	print set([ i[0:2] 
-		for i in notes 
-		if -1 != i.find("b") ])
+	return 0
+
+def set_instrument(name):
+	global g_instrument
+
+	# We assume that the files were set up properly, so if C4 exists, the rest do as well
+	fname = get_sound_file(name, 'C4')
+	if not os.path.isfile(fname):
+		error("%s is not a valid instrument" % (name))
+		return -1
+
+	g_instrument = name
+	return 0
+
 
 # Should be possible to enable or disable the entire thing
 def system_on():
-	power=1
+	global g_power
+	g_power = 1
 
 def system_off():
-	power=0
+	global power
+	g_power = 0
 	pygame.mixer.stop()
 
 def play_song(fname):
 	# easter egg: override the normal working and play a full song
 	pass
 
-def set_instrument(name):
-	#TODO: verify that it's a valid instrument, and leave it unchanged otherwise
-	instrument = name
-	pass
-
 def ui():
-	#TODO: stick a keyboard on the wall to change settings.
+	#TODO: stick a keyboard and small lcd display or something on the wall to change settings
 	#And/or have it networked to boffin
 	pass
 
-def main():
+def init()
 	pygame.mixer.pre_init(44100, -16, 2, 2048)
 	pygame.mixer.init()
 	pygame.init()
+	set_instrument('piano')
+	set_key('C', 0)
 
-	set_key("C", 0)
-	set_key("G", 0)
-	set_key("D", 0)
-	set_key("A", 0)
-	set_key("E", 0)
-	set_key("B", 0)
-	set_key("Gb", 0)
-	set_key("Db", 0)
-	set_key("Ab", 0)
-	set_key("Eb", 0)
-	set_key("Bb", 0)
-	set_key("F", 0)
+def cleanup()
+	pygame.mixer.quit()
 
-if "__main__" == __name__ :
+def main():
+	init()
+
+	while (1):
+		try:
+			ui()
+		except:
+			# Should never happen, so if it does, just do a soft reset
+			cleanup()
+			init()
+
+	#for key in [ 'C', 'G', 'D', 'E', 'B', 'Gb', 'Db', 'Ab', 'Db', 'Ab', 'Eb', 'Bb', 'F' ]:
+	#	set_key(key, 0)
+	#	sys.stdout.write("%2s: " % (key))
+	#	debug(set([ i[0:2] 
+	#		for i in notes 
+	#		if -1 != i.find('b') ]))
+
+if '__main__' == __name__ :
 	main()
 
