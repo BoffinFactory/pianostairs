@@ -1,7 +1,8 @@
-import pygame, itertools, collections, sys
+import pygame, itertools, collections, sys, os, gui
 
 # Constants
-NSTAIRS = 36
+NSTAIRS = 32
+STEPS_PER_FLIGHT = 16
 SOUNDS_DIR = 'sounds'
 DEBUG = 1
 
@@ -13,17 +14,17 @@ g_power = 1 # if 0, nothing runs
 
 # Output functions.  Depending on the physical interface, I might want these doing different things
 def output(s):
-	print s
+	gui.write(s)
 
 def error(s):
-	print "ERROR: " + s
+	output("ERROR: " + s)
 
 def debug(s):
 	global DEBUG
-	if DEBUG: print "DEBUG: " + s
+	if DEBUG: output("DEBUG: " + s)
 
 
-def get_sound_file(instrument, note)
+def get_sound_file(instrument, note):
 	return SOUNDS_DIR + '/' + instrument + '-' + note + '.wav'
 
 def stair_down(stair_num):
@@ -79,7 +80,8 @@ def set_instrument(name):
 
 	# We assume that the files were set up properly, so if C4 exists, the rest do as well
 	fname = get_sound_file(name, 'C4')
-	if not os.path.isfile(fname):
+	if not name in list_instruments():
+	#if not os.path.isfile(fname):
 		error("%s is not a valid instrument" % (name))
 		return -1
 
@@ -101,19 +103,22 @@ def play_song(fname):
 	# easter egg: override the normal working and play a full song
 	pass
 
+def list_instruments():
+	return list(set([ fname.split('-')[0] for fname in os.listdir(SOUNDS_DIR) ]))
+
 def ui():
 	#TODO: stick a keyboard and small lcd display or something on the wall to change settings
 	#And/or have it networked to boffin
 	pass
 
-def init()
+def init():
 	pygame.mixer.pre_init(44100, -16, 2, 2048)
 	pygame.mixer.init()
 	pygame.init()
 	set_instrument('piano')
 	set_key('C', 0)
 
-def cleanup()
+def cleanup():
 	pygame.mixer.quit()
 
 def main():
