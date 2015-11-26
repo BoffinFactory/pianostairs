@@ -14,6 +14,7 @@ g_power = 1 # if 0, nothing runs
 
 # Output functions.  Depending on the physical interface, I might want these doing different things
 def output(s):
+	global gui
 	gui.write(s)
 
 def error(s):
@@ -104,7 +105,9 @@ def play_song(fname):
 	pass
 
 def list_instruments():
-	return list(set([ fname.split('-')[0] for fname in os.listdir(SOUNDS_DIR) ]))
+	lst = list(set([ fname.split('-')[0] for fname in os.listdir(SOUNDS_DIR) ]))
+	lst.sort()
+	return lst
 
 def ui():
 	#TODO: stick a keyboard and small lcd display or something on the wall to change settings
@@ -115,7 +118,6 @@ def init():
 	pygame.mixer.pre_init(44100, -16, 2, 2048)
 	pygame.mixer.init()
 	pygame.init()
-	set_instrument('piano')
 	set_key('C', 0)
 
 def cleanup():
@@ -139,6 +141,6 @@ def main():
 	#		for i in notes 
 	#		if -1 != i.find('b') ]))
 
-if '__main__' == __name__ :
-	main()
+#if '__main__' == __name__ :
+#	main()
 

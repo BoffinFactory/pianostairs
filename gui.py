@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import player, threading, collections
 from ScrolledText import ScrolledText
 from Tkinter import *
@@ -32,6 +34,8 @@ class GUI(threading.Thread):
 		self.output.see(END)
 
 	def run(self):
+		global g_instrument
+
 		def update_settings():
 			player.set_instrument(selected_instrument.get())
 			player.set_key(selected_key.get(), use_accidentals.get())
@@ -52,7 +56,7 @@ class GUI(threading.Thread):
 		menu_key = Menu(menu, tearoff=0)
 		
 		selected_instrument = StringVar(menu_instrument)
-		selected_instrument.set('piano')
+		selected_instrument.set(player.g_instrument)
 		selected_key = StringVar(menu_key)
 		selected_key.set('C')
 		use_accidentals = IntVar(menu)
