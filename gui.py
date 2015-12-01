@@ -3,6 +3,7 @@
 import player, threading, collections
 from ScrolledText import ScrolledText
 from Tkinter import *
+from  PIL import Image, ImageTk
 
 MAX_MESSAGES = 64
 
@@ -25,7 +26,7 @@ class GUI(threading.Thread):
 
 		msg = ''
 		for i in self.messages:
-			print i
+			#print i
 			msg = '%s\n%s' % (msg,i)
 
 		#set text and scroll to end 
@@ -33,12 +34,46 @@ class GUI(threading.Thread):
 		self.output.insert(END, msg)
 		self.output.see(END)
 
+	def find_key(self, note):
+		#TODO: rather than trying to match this up perfectly to an existing image,
+		#just draw the image directly.  Then the keys will have uniform width
+		#In fact, I might even be able to replace the rectangles with Buttons
+		KEY_ORIGIN = (23, 69)#, 12, 20)
+		KEY_WIDTH = 9.8
+		KEY_HEIGHT = 49
+		KEY_BLACK_OFFSET = (3, 24) # e.g. Ab's lower left corner is A's lower left corner minus this
+		KEY_BLACK_WIDTH = 5
+
+		tone = (ord(note[0]) - ord('C')) % 8
+		flat = len(note) == 3
+		octave = ord(note[len(note) - 1]) - ord('0')
+
+		(x0, y0) = KEY_ORIGIN
+		#x0 += (tone) * KEY_WIDTH
+		x0 += (7 * (octave - 1)  +  tone) * KEY_WIDTH
+		y1 = y0 - KEY_HEIGHT
+		if (flat): 
+			(x0, y0) = (x0 - KEY_BLACK_OFFSET[0], y0 - KEY_BLACK_OFFSET[1])
+			x1 = x0 + KEY_BLACK_WIDTH
+		else:
+			x1 = x0 + KEY_WIDTH
+
+		#return (3, 69, 12, 20)
+		return (x0, y0, x1, y1)
+
 	def run(self):
 		global g_instrument
 
 		def update_settings():
 			player.set_instrument(selected_instrument.get())
 			player.set_key(selected_key.get(), use_accidentals.get())
+		
+			(x0, y0, x1, y1) = ui.find_key(selected_key.get() + "4")
+
+			canvas.delete("all")
+			self.image = ImageTk.PhotoImage(file = "keyboard.png")
+			canvas.create_image(0, 0, image = self.image, anchor = NW)
+			canvas.create_rectangle(x0, y0, x1, y1, outline="blue")
 
 			write(player.g_notes)
 
@@ -76,10 +111,17 @@ class GUI(threading.Thread):
 		self.output = ScrolledText(frame)
 		self.output.pack(fill=BOTH)
 
+		self.image = ImageTk.PhotoImage(file = "keyboard.png")
+		canvas = Canvas(height = self.image.height(), width=self.image.width())
+		canvas.create_image(0, 0, image = self.image, anchor = NW)
+		canvas.pack(expand = YES, fill = BOTH)
+
+
 		win.config(menu=menu)
 		update_settings()
+		
 
-		win.geometry('{}x{}'.format(320, 200))
+		#win.geometry('{}x{}'.format(320, 200))
 		win.mainloop()
 
 ui = GUI()
