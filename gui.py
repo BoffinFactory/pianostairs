@@ -11,9 +11,8 @@ def write(s):
 	global ui
 	ui.write(s)
 
-class GUI(threading.Thread):
+class GUI:
 	def __init__(self):
-		threading.Thread.__init__(self)
 		self.messages = collections.deque(maxlen=MAX_MESSAGES)
 		
 	def noop():
@@ -61,7 +60,7 @@ class GUI(threading.Thread):
 		#return (3, 69, 12, 20)
 		return (x0, y0, x1, y1)
 
-	def run(self):
+	def run(self, f):
 		global g_instrument
 
 		def update_settings():
@@ -116,17 +115,18 @@ class GUI(threading.Thread):
 		canvas.create_image(0, 0, image = self.image, anchor = NW)
 		canvas.pack(expand = YES, fill = BOTH)
 
-
 		win.config(menu=menu)
 		update_settings()
-		
 
 		#win.geometry('{}x{}'.format(320, 200))
+		win.after(0, f)
 		win.mainloop()
 
 ui = GUI()
 
+def f():
+	print "I'm going to be replaced by the code that decodes the pin input and calls the stuff in player.py!"
+
 if '__main__' == __name__ :
-	ui.start()
-	ui.join()
-	
+	ui.run(f)
+
