@@ -53,16 +53,12 @@ def set_key(key, include_accidentals):
 
 	if key not in arr:
 		error("key %s is invalid.  Select one of %s" % (key, arr))
-		return -1
+		return None
 
-	basenotes = collections.deque(arr)
-	basenotes.rotate(12 - arr.index(key))
-
-	# 8 is just an upper bound. Beyond that, we can't center on C4 and the assertions will fail
-	# But since outside that range is basically outside human hearing...
+	offset = arr.index(key)
 	notes = ["%s%d" % (note,octave) 
-		for (i, (octave,note)) in enumerate(itertools.product(range(0, 8), basenotes)) 
-		if include_accidentals or (i % 12 not in [ 1, 3, 6, 8, 10 ]) # filter accidentals
+		for (i, (octave,note)) in enumerate(itertools.product(range(0, 8), arr)) 
+		if include_accidentals or ((i - offset) % 12 not in [ 1, 3, 6, 8, 10 ]) # filter accidentals
 	]
 
 	# Center on octave 4
@@ -74,20 +70,16 @@ def set_key(key, include_accidentals):
 	g_notes = notes[min : NSTAIRS + min]
 	assert len(g_notes) == NSTAIRS
 
-	return 0
-
 def set_instrument(name):
 	global g_instrument
 
 	# We assume that the files were set up properly, so if C4 exists, the rest do as well
 	fname = get_sound_file(name, 'C4')
 	if not name in list_instruments():
-	#if not os.path.isfile(fname):
 		error("%s is not a valid instrument" % (name))
-		return -1
+		return None
 
 	g_instrument = name
-	return 0
 
 
 # Should be possible to enable or disable the entire thing
@@ -109,11 +101,6 @@ def list_instruments():
 	lst.sort()
 	return lst
 
-def ui():
-	#TODO: stick a keyboard and small lcd display or something on the wall to change settings
-	#And/or have it networked to boffin
-	pass
-
 def init():
 	pygame.mixer.pre_init(44100, -16, 2, 2048)
 	pygame.mixer.init()
@@ -123,24 +110,17 @@ def init():
 def cleanup():
 	pygame.mixer.quit()
 
+# Just a test framework.  gui.py is the main module
 def main():
 	init()
 
-	while (1):
-		try:
-			ui()
-		except:
-			# Should never happen, so if it does, just do a soft reset
-			cleanup()
-			init()
+	for key in [ 'C', 'G', 'D', 'E', 'B', 'Gb', 'Db', 'Ab', 'Db', 'Ab', 'Eb', 'Bb', 'F' ]:
+		set_key(key, 0)
+		sys.stdout.write("%2s: " % (key))
+		print(set([ i[0:2] 
+			for i in g_notes 
+			if -1 != i.find('b') ]))
 
-	#for key in [ 'C', 'G', 'D', 'E', 'B', 'Gb', 'Db', 'Ab', 'Db', 'Ab', 'Eb', 'Bb', 'F' ]:
-	#	set_key(key, 0)
-	#	sys.stdout.write("%2s: " % (key))
-	#	debug(set([ i[0:2] 
-	#		for i in notes 
-	#		if -1 != i.find('b') ]))
-
-#if '__main__' == __name__ :
-#	main()
+if '__main__' == __name__ :
+	main()
 
