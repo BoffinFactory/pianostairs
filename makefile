@@ -75,7 +75,7 @@ clean:
 	echo '\version "2.16.2"'; \
 	echo '\score {'; \
 	echo '\new PianoStaff'; \
-	echo '\autochange \relative c,,, {'; \
+	echo '\autochange \relative $(tone),,, {' | sed 's/b/es/g' | tr '[A-Z]' '[a-z]'; \
 	echo '\set Staff.midiInstrument = #$(midi_instrument)'; \
 	echo -n '$(tone)' | sed 's/b/es/g' | tr '[A-Z]' '[a-z]'; \
 	for i in `seq 1 $(octave)`; do echo -n "'"; done; \
