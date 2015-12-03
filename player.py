@@ -5,7 +5,7 @@ import pygame, itertools, collections, sys, os, gui
 NSTAIRS = 32
 STEPS_PER_FLIGHT = 16
 SOUNDS_DIR = 'sounds'
-DEBUG = 1
+DEBUG = 0
 
 # Globals. Don't modify these directly.  set_(key|instrument) and power_(on|off) run additional checks and/or do stuff.
 g_instrument = 'piano'
@@ -13,13 +13,9 @@ g_note_from_stair = []
 g_index_from_note = {}
 g_power = 1 # if 0, nothing runs
 
-
 # Output functions.  Depending on the physical interface, I might want these doing different things
 def output(s):
-	if '__main__' == __name__ :
-		print(s)
-	else:
-		gui.ui.write(s)
+	gui.extern_kludge().write(s)
 
 def error(s):
 	output("ERROR: " + s)
@@ -127,8 +123,7 @@ def init():
 def cleanup():
 	pygame.mixer.quit()
 
-# Just a test framework.  gui.py is the main module
-def main():
+def test():
 	init()
 
 	for key in [ 'C', 'G', 'D', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F' ]:
@@ -139,5 +134,4 @@ def main():
 			if -1 != i.find('b') ]))
 
 if '__main__' == __name__ :
-	main()
-
+	test()

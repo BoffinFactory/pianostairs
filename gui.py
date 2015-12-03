@@ -5,9 +5,19 @@ from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
 
-def write(s):
-	global ui
-	ui.write(s)
+g_object = None
+
+# Python doesn't HAVE linkage specifiers.  Importing a module actually INTERPRETS the
+# entire source file, creating SEPARATE INSTANCES of every variable defined in the
+# file.  There's probably a more elegant hack to get this to work, but this works for
+# now.
+def extern_kludge():
+	global g_object
+	if g_object is None:
+		print "new object"
+		g_object = GUI()
+
+	return g_object
 
 class GUI:
 	MAX_MESSAGES = 64
@@ -15,9 +25,6 @@ class GUI:
 	PIANO_HEIGHT = PIANO_WIDTH / 10.625
 	PIANO_BORDER = 10
 
-	def __init__(self):
-		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
-		
 	#def noop(self):
 	#	pass
 
@@ -121,25 +128,27 @@ class GUI:
 		self.canvas.delete("all")
 		for key in range (0, 52): draw_white_key(key)
 		for key in range (1, 52): draw_black_key(key)
-
-	def run(self, f):
+	
+	def __init__(self):
 		global g_instrument
-
+	
 		def update_settings():
 			player.set_instrument(selected_instrument.get())
 			player.set_key(selected_key.get(), use_accidentals.get())
 			self.draw_keyboard()
 
-		#TODO: update status bar
-		win = Tk()
-		win.minsize(240, 320)
-		frame = Frame(win)
-		frame.pack(fill=BOTH, expand=1)
+		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
+		self.win = Tk()
+		self.win.minsize(240, 320)
+		self.frame = Frame(self.win)
+		self.frame.pack(fill=BOTH, expand=1)
 		#g.protocol('WM_DELETE_WINDOW', noop) # make window not closable
-		win.title('pianostairs')
+		self.win.title('pianostairs')
+		self.output = ScrolledText(self.frame)
+		self.output.pack(fill=BOTH)
 
 		# Menu
-		menu = Menu(frame)
+		menu = Menu(self.frame)
 		menu_instrument = Menu(menu, tearoff=0)
 		menu_key = Menu(menu, tearoff=0)
 		
@@ -161,25 +170,15 @@ class GUI:
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)
 		
-		self.output = ScrolledText(frame)
-		self.output.pack(fill=BOTH)
-
 		self.canvas = Canvas(height = self.PIANO_HEIGHT + 2 * self.PIANO_BORDER, 
 			width=self.PIANO_WIDTH + 2 * self.PIANO_BORDER)
 		self.canvas.pack(expand = YES, fill = BOTH)
 
-		win.config(menu=menu)
+		self.win.config(menu=menu)
 		update_settings()
 
-		win.after(0, f)
-		win.mainloop()
+	def run(self, f):
+		self.win.after(0, f)
+		self.win.mainloop()
 
-ui = GUI()
-
-def f():
-	print "I'm going to be replaced by the code that decodes the pin input and calls the stuff in player.py!"
-	player.init()
-
-if '__main__' == __name__ :
-	ui.run(f)
 
