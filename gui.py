@@ -18,8 +18,8 @@ class GUI:
 	def __init__(self):
 		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
 		
-	def noop():
-		pass
+	#def noop(self):
+	#	pass
 
 	def write(self, s):
 		self.messages.append(s)
@@ -32,6 +32,10 @@ class GUI:
 		self.output.delete(1.1, END)
 		self.output.insert(END, msg)
 		self.output.see(END)
+
+	def press_key(self, note):
+		self.write(note)
+		player.sound_play(note)
 
 	def draw_keyboard(self):
 		""" draw standard 88 key piano, with each flight of stairs highlighted in a different color """
@@ -56,15 +60,22 @@ class GUI:
 			octave = (key + 5) / 7
 			note = tone + str(octave)
 
-			color="white"
-			outline="#888888"
+			color = 0xFFFFFF
+			outline = "#888888"
 			for i in range(0, len(flights)):
 				if (note in flights[i]): 
-					color = "#%06x" % avg_color(colors[i % len(colors)], 0xFFFFFF)
+					color = avg_color(colors[i % len(colors)], 0xFFFFFF)
 					outline = "#444444"
 
-			self.canvas.create_rectangle(x0, y0, x1, y1, outline=outline, fill=color)
+			#self.canvas.create_rectangle(x0, y0, x1, y1, outline=outline, fill="#%06x" % (color))
 			#self.canvas.create_text(x0 + (x1-x0)/2, y0 + 0.8 * (y1-y0), text=note, fill="blue")
+			active_color = avg_color(color, 0xCCCCCC)
+			button = Button(self.canvas, 
+				highlightbackground=outline, bg="#%06x" % (color),
+				highlightcolor=outline, activebackground="#%06x" % (active_color),
+				borderwidth=1, highlightthickness=0,
+				command=lambda : self.press_key(note))
+			button.place(x=x0, y=y0, width=x1-x0, height=y1-y0)
 
 		def draw_black_key(key):
 			""" key is the white key that this is the flat of """
@@ -82,16 +93,23 @@ class GUI:
 			octave = (key + 5) / 7
 			note = tone + "b" + str(octave)
 		
-			color="black"
+			color=0x000000
 			for i in range(0, len(flights)):
 				if (note in flights[i]): 
-					color = "#%06x" % avg_color(colors[i % len(colors)], 0x000000)
+					color = avg_color(colors[i % len(colors)], 0x000000)
 
-			self.canvas.create_rectangle(x0, y0, x1, y1, outline="grey", fill=color)
+			#self.canvas.create_rectangle(x0, y0, x1, y1, outline="grey", fill="#%06x" % (color))
 			#self.canvas.create_text(x0 + (x1-x0)/2, y0 + 5 + (y1-y0), text=note, fill="blue")
+			active_color = avg_color(avg_color(color, 0xFFFFFF), 0xFFFFFF)
+			button = Button(self.canvas, 
+				highlightbackground="grey", bg="#%06x" % (color),
+				highlightcolor="grey", activebackground="#%06x" % (active_color),
+				borderwidth=1, highlightthickness=0,
+				command=lambda : self.press_key(note))
+			button.place(x=x0, y=y0, width=x1-x0, height=y1-y0)
 
-		max = int(math.ceil(len(player.g_notes) / player.STEPS_PER_FLIGHT))
-		flights = [ player.g_notes[i * player.STEPS_PER_FLIGHT : (i + 1) * player.STEPS_PER_FLIGHT] for i in range(0, max) ]
+		max = int(math.ceil(len(player.g_note_from_stair) / player.STEPS_PER_FLIGHT))
+		flights = [ player.g_note_from_stair[i * player.STEPS_PER_FLIGHT : (i + 1) * player.STEPS_PER_FLIGHT] for i in range(0, max) ]
 		colors = ( 0x0000FF, 0x00FF00, 0xFF0000, 0x00FFFF, 0xFF00FF, 0xFFFF00 )
 
 		white_key_width = self.PIANO_WIDTH / 52
@@ -160,6 +178,7 @@ ui = GUI()
 
 def f():
 	print "I'm going to be replaced by the code that decodes the pin input and calls the stuff in player.py!"
+	player.init()
 
 if '__main__' == __name__ :
 	ui.run(f)
