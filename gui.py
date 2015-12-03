@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import player, threading, collections, math
 from ScrolledText import ScrolledText
 from Tkinter import *
