@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import pygame, itertools, collections, sys, os, gui
 
 # Constants
