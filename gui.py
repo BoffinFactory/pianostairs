@@ -1,21 +1,9 @@
-import player, threading, collections, math
+import config as G, player, threading, collections, math
 from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
 
-g_object = None
-
-# Python doesn't HAVE linkage specifiers.  Importing a module actually INTERPRETS the
-# entire source file, creating SEPARATE INSTANCES of every variable defined in the
-# file.  There's probably a more elegant hack to get this to work, but this works for
-# now.
-def extern_kludge():
-	global g_object
-	if g_object is None:
-		print "new object"
-		g_object = GUI()
-
-	return g_object
+G.gui = None
 
 class GUI:
 	MAX_MESSAGES = 64
@@ -113,8 +101,8 @@ class GUI:
 				command=lambda : self.press_key(note))
 			button.place(x=x0, y=y0, width=x1-x0, height=y1-y0)
 
-		max = int(math.ceil(len(player.g_note_from_stair) / player.STEPS_PER_FLIGHT))
-		flights = [ player.g_note_from_stair[i * player.STEPS_PER_FLIGHT : (i + 1) * player.STEPS_PER_FLIGHT] for i in range(0, max) ]
+		max = int(math.ceil(len(G.note_from_stair) / G.STEPS_PER_FLIGHT))
+		flights = [ G.note_from_stair[i * G.STEPS_PER_FLIGHT : (i + 1) * G.STEPS_PER_FLIGHT] for i in range(0, max) ]
 		colors = ( 0x0000FF, 0x00FF00, 0xFF0000, 0x00FFFF, 0xFF00FF, 0xFFFF00 )
 
 		white_key_width = self.PIANO_WIDTH / 52
@@ -128,12 +116,16 @@ class GUI:
 		for key in range (1, 52): draw_black_key(key)
 	
 	def __init__(self):
-		global g_instrument
-	
 		def update_settings():
 			player.set_instrument(selected_instrument.get())
 			player.set_key(selected_key.get(), use_accidentals.get())
 			self.draw_keyboard()
+
+		def toggle_power():
+			if (power_button.get()):
+				player.system_on()
+			else:
+				player.system_off()
 
 		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
 		self.win = Tk()
@@ -151,11 +143,14 @@ class GUI:
 		menu_key = Menu(menu, tearoff=0)
 		
 		selected_instrument = StringVar(menu_instrument)
-		selected_instrument.set(player.g_instrument)
+		selected_instrument.set(G.instrument)
 		selected_key = StringVar(menu_key)
 		selected_key.set('C')
 		use_accidentals = IntVar(menu)
 		use_accidentals.set(0)
+
+		power_button = IntVar(menu)
+		power_button.set(1)
 
 		for name in player.list_instruments():
 			menu_instrument.add_radiobutton(label=name, command=update_settings, var=selected_instrument)
@@ -165,6 +160,7 @@ class GUI:
 		for key in [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']:
 			menu_key.add_radiobutton(label=key, command=update_settings, var=selected_key)
 			
+		menu.add_checkbutton(label='Enable Stairs', command=lambda: player.system_on() if power_button.get() else player.system_off(), var=power_button)
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)
 		
