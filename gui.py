@@ -137,18 +137,32 @@ class GUI:
 		buttons = Frame(self.frame)
 		buttons.pack(fill=BOTH)
 
-		mute_button = IntVar(buttons)
+		mute_button = IntVar()
 		mute_button.set(0)
 
 		mute = Checkbutton(master=buttons, text=' Mute ', indicatoron=0, var=mute_button,
 			command=lambda: player.system_off() if mute_button.get() else player.system_on())
 		mute.pack(side=LEFT)
 	
-		self.demo_button = IntVar(buttons)
+		self.demo_button = IntVar()
 		self.demo_button.set(0)
 		demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
 			command=lambda: parser.playsong('copeland.score'))
 		demo.pack(side=LEFT)
+		
+		#Volume control	
+		vol_frame = Frame(buttons)
+		volume = DoubleVar()
+		def set_volume(*args):
+			G.volume = volume.get() / 11.0
+		volume.trace("w", set_volume)
+		volume.set(10.0)
+		Label(vol_frame, text='  Volume: ').pack(side=LEFT)
+		Scale(vol_frame, showvalue=0, from_=0, to=11, resolution=.1, 
+			length=220, orient=HORIZONTAL, variable=volume).pack(side=LEFT)
+		Label(vol_frame, textvariable=volume, width=4).pack(side=LEFT)
+		vol_frame.pack(side=RIGHT)
+
 
 		self.output = ScrolledText(self.frame)
 		self.output.pack(fill=BOTH)
@@ -158,11 +172,11 @@ class GUI:
 		menu_instrument = Menu(menu, tearoff=0)
 		menu_key = Menu(menu, tearoff=0)
 		
-		self.selected_instrument = StringVar(menu_instrument)
+		self.selected_instrument = StringVar()
 		self.selected_instrument.set(G.instrument)
-		selected_key = StringVar(menu_key)
+		selected_key = StringVar()
 		selected_key.set('C')
-		use_accidentals = IntVar(menu)
+		use_accidentals = IntVar()
 		use_accidentals.set(0)
 
 		for name in player.list_instruments():

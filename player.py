@@ -11,8 +11,10 @@ def sound_play(note):
 		G.error('File not found: ' + fname)
 		return
 	channel = pygame.mixer.Channel(G.index_from_note[note])
-	channel.play(pygame.mixer.Sound(fname))
-	G.debug("start %s on channel %d" % (fname, G.index_from_note[note]))
+	sound = pygame.mixer.Sound(fname)
+	sound.set_volume(G.volume)
+	channel.play(sound)
+	G.debug("start %s on channel %d at volume %.1f" % (fname, G.index_from_note[note], 11.0 * G.volume))
 
 def sound_stop(note):
 	channel = pygame.mixer.Channel(G.index_from_note[note])

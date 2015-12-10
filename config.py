@@ -10,7 +10,8 @@ note_from_stair = []
 index_from_note = {}
 power = 1 # if 0, nothing runs
 
-gui = None
+gui = None #GUI
+volume = 0.0
 
 # Output functions.  Depending on the physical interface, I might want these doing different things
 def output(s):
