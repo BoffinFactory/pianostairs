@@ -16,6 +16,7 @@ INSTRUMENTS := \
 	timpani:timpani \
 	saxophone:baritone_sax \
 	bassoon:bassoon \
+	trumpet:trumpet \
 
 TONES := C Db D Eb E F Gb G Ab A Bb B
 OCTAVES := $(shell seq 0 8)

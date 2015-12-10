@@ -1,18 +1,16 @@
-import config as G, player, threading, collections, math
+import config as G, player, threading, collections, math, sys
 from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
-
-G.gui = None
+	
+#def close_window():
+#	sys.exit()
 
 class GUI:
 	MAX_MESSAGES = 64
 	PIANO_WIDTH = 1020
 	PIANO_HEIGHT = PIANO_WIDTH / 10.625
 	PIANO_BORDER = 10
-
-	#def noop(self):
-	#	pass
 
 	def write(self, s):
 		self.messages.append(s)
@@ -117,12 +115,12 @@ class GUI:
 	
 	def __init__(self):
 		def update_settings():
-			player.set_instrument(selected_instrument.get())
+			player.set_instrument(self.selected_instrument.get())
 			player.set_key(selected_key.get(), use_accidentals.get())
 			self.draw_keyboard()
 
 		def toggle_power():
-			if (power_button.get()):
+			if (mute_button.get()):
 				player.system_on()
 			else:
 				player.system_off()
@@ -132,7 +130,7 @@ class GUI:
 		self.win.minsize(240, 320)
 		self.frame = Frame(self.win)
 		self.frame.pack(fill=BOTH, expand=1)
-		#g.protocol('WM_DELETE_WINDOW', noop) # make window not closable
+		#self.win.protocol('WM_DELETE_WINDOW', close_window)
 		self.win.title('pianostairs')
 		self.output = ScrolledText(self.frame)
 		self.output.pack(fill=BOTH)
@@ -142,25 +140,25 @@ class GUI:
 		menu_instrument = Menu(menu, tearoff=0)
 		menu_key = Menu(menu, tearoff=0)
 		
-		selected_instrument = StringVar(menu_instrument)
-		selected_instrument.set(G.instrument)
+		self.selected_instrument = StringVar(menu_instrument)
+		self.selected_instrument.set(G.instrument)
 		selected_key = StringVar(menu_key)
 		selected_key.set('C')
 		use_accidentals = IntVar(menu)
 		use_accidentals.set(0)
 
-		power_button = IntVar(menu)
-		power_button.set(1)
+		mute_button = IntVar(menu)
+		mute_button.set(0)
 
 		for name in player.list_instruments():
-			menu_instrument.add_radiobutton(label=name, command=update_settings, var=selected_instrument)
+			menu_instrument.add_radiobutton(label=name, command=update_settings, var=self.selected_instrument)
 	
 		menu_key.add_checkbutton(label='Include Accidentals', command=update_settings, var=use_accidentals)
 		menu_key.add_separator()
 		for key in [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']:
 			menu_key.add_radiobutton(label=key, command=update_settings, var=selected_key)
 			
-		menu.add_checkbutton(label='Enable Stairs', command=lambda: player.system_on() if power_button.get() else player.system_off(), var=power_button)
+		menu.add_checkbutton(label='Mute', command=lambda: player.system_off() if mute_button.get() else player.system_on(), var=mute_button)
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)
 		
@@ -171,8 +169,9 @@ class GUI:
 		self.win.config(menu=menu)
 		update_settings()
 
-	def run(self, f):
-		self.win.after(0, f)
-		self.win.mainloop()
+def run(f):
+	G.gui = GUI()
+	G.gui.win.after(0, f)
+	G.gui.win.mainloop()
 
 

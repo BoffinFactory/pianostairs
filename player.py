@@ -1,15 +1,5 @@
 import config as G, pygame, itertools, collections, sys, os, gui
 
-# Output functions.  Depending on the physical interface, I might want these doing different things
-def output(s):
-	G.gui.write(s)
-
-def error(s):
-	output("ERROR: " + s)
-
-def debug(s):
-	if G.DEBUG: output("DEBUG: " + s)
-
 def get_sound_file(instrument, note):
 	return G.SOUNDS_DIR + '/' + instrument + '-' + note + '.wav'
 
@@ -17,14 +7,17 @@ def sound_play(note):
 	if not G.power: return
 
 	fname = get_sound_file(G.instrument, note)
+	if not os.path.isfile(fname):
+		G.error('File not found: ' + fname)
+		return
 	channel = pygame.mixer.Channel(G.index_from_note[note])
 	channel.play(pygame.mixer.Sound(fname))
-	debug("start %s on channel %d\n" % (fname, G.index_from_note[note]))
+	G.debug("start %s on channel %d" % (fname, G.index_from_note[note]))
 
 def sound_stop(note):
 	channel = pygame.mixer.Channel(G.index_from_note[note])
 	channel.stop()
-	debug("stop channel %d\n" % (G.index_from_note[note]))
+	G.debug("stop channel %d" % (G.index_from_note[note]))
 
 def stair_down(stair_num):
 	if not G.power: return
@@ -38,7 +31,7 @@ def set_key(key, include_accidentals):
 	arr = [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B' ]
 
 	if key not in arr:
-		error("key %s is invalid.  Select one of %s" % (key, arr))
+		G.error("key %s is invalid.  Select one of %s" % (key, arr))
 		return None
 
 	offset = arr.index(key)
@@ -60,10 +53,12 @@ def set_instrument(name):
 	# We assume that the files were set up properly, so if C4 exists, the rest do as well
 	fname = get_sound_file(name, 'C4')
 	if not name in list_instruments():
-		error("%s is not a valid instrument" % (name))
+		G.error("%s is not a valid instrument" % (name))
 		return None
 
 	G.instrument = name
+	if G.gui: G.gui.selected_instrument.set(G.instrument)
+	G.output('Instrument = ' + G.instrument)
 
 
 # Should be possible to enable or disable the entire thing
