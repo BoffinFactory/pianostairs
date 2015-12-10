@@ -1,4 +1,4 @@
-import config as G, player, threading, collections, math, sys
+import config as G, player, threading, collections, math, sys, parser
 from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
@@ -132,6 +132,24 @@ class GUI:
 		self.frame.pack(fill=BOTH, expand=1)
 		#self.win.protocol('WM_DELETE_WINDOW', close_window)
 		self.win.title('pianostairs')
+
+	
+		buttons = Frame(self.frame)
+		buttons.pack(fill=BOTH)
+
+		mute_button = IntVar(buttons)
+		mute_button.set(0)
+
+		mute = Checkbutton(master=buttons, text=' Mute ', indicatoron=0, var=mute_button,
+			command=lambda: player.system_off() if mute_button.get() else player.system_on())
+		mute.pack(side=LEFT)
+	
+		self.demo_button = IntVar(buttons)
+		self.demo_button.set(0)
+		demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
+			command=lambda: parser.playsong('copeland.score'))
+		demo.pack(side=LEFT)
+
 		self.output = ScrolledText(self.frame)
 		self.output.pack(fill=BOTH)
 
@@ -147,9 +165,6 @@ class GUI:
 		use_accidentals = IntVar(menu)
 		use_accidentals.set(0)
 
-		mute_button = IntVar(menu)
-		mute_button.set(0)
-
 		for name in player.list_instruments():
 			menu_instrument.add_radiobutton(label=name, command=update_settings, var=self.selected_instrument)
 	
@@ -158,10 +173,10 @@ class GUI:
 		for key in [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']:
 			menu_key.add_radiobutton(label=key, command=update_settings, var=selected_key)
 			
-		menu.add_checkbutton(label='Mute', command=lambda: player.system_off() if mute_button.get() else player.system_on(), var=mute_button)
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)
 		
+
 		self.canvas = Canvas(height = self.PIANO_HEIGHT + 2 * self.PIANO_BORDER, 
 			width=self.PIANO_WIDTH + 2 * self.PIANO_BORDER)
 		self.canvas.pack(expand = YES, fill = BOTH)
