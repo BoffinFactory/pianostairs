@@ -14,6 +14,7 @@ def sound_play(note):
 	sound = pygame.mixer.Sound(fname)
 	sound.set_volume(G.volume)
 	channel.play(sound)
+	G.output('Play %s' % (note))
 	G.debug("start %s on channel %d at volume %.1f" % (fname, G.index_from_note[note], 11.0 * G.volume))
 
 def sound_stop(note):
@@ -23,10 +24,14 @@ def sound_stop(note):
 
 def stair_down(stair_num):
 	if not G.power: return
-	sound_play(G.note_from_stair[stair_num])
+	note = G.note_from_stair[stair_num]
+	G.gui.key_down(note)
+	sound_play(note)
 
 def stair_up(stair_num):
-	sound_play(G.note_from_stair[stair_num])
+	note = G.note_from_stair[stair_num]
+	G.gui.key_up(note)
+	sound_stop(note)
 
 #key is the *major* key it's in.  It'll be centered on that note in octave 4
 def set_key(key, include_accidentals):

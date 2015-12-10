@@ -1,4 +1,4 @@
-import config as G, player, threading, collections, math, sys, parser
+import config as G, player, threading, collections, math, sys, parser, pygame
 from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
@@ -11,6 +11,7 @@ class GUI:
 	PIANO_WIDTH = 1020
 	PIANO_HEIGHT = PIANO_WIDTH / 10.625
 	PIANO_BORDER = 10
+	keys = {}
 
 	def write(self, s):
 		self.messages.append(s)
@@ -24,8 +25,17 @@ class GUI:
 		self.output.insert(END, msg)
 		self.output.see(END)
 
+	def key_up(self, note):
+		color = self.keys[note].config('disabledforeground')[4]
+		self.keys[note].config(relief=RAISED)
+		self.keys[note].config(background=color)
+
+	def key_down(self, note):
+		color = self.keys[note].config('activebackground')[4]
+		self.keys[note].config(relief=SUNKEN)
+		self.keys[note].config(background=color)
+
 	def press_key(self, note):
-		self.write(note)
 		player.sound_play(note)
 
 	def draw_keyboard(self):
@@ -60,13 +70,15 @@ class GUI:
 
 			#self.canvas.create_rectangle(x0, y0, x1, y1, outline=outline, fill="#%06x" % (color))
 			#self.canvas.create_text(x0 + (x1-x0)/2, y0 + 0.8 * (y1-y0), text=note, fill="blue")
+			
 			active_color = avg_color(color, 0xCCCCCC)
-			button = Button(self.canvas, 
+			self.keys[note] = Button(self.canvas, 
 				highlightbackground=outline, bg="#%06x" % (color),
 				highlightcolor=outline, activebackground="#%06x" % (active_color),
+				disabledforeground="#%06x" % (color), # kludge to store it
 				borderwidth=1, highlightthickness=0,
 				command=lambda : self.press_key(note))
-			button.place(x=x0, y=y0, width=x1-x0, height=y1-y0)
+			self.keys[note].place(x=x0, y=y0, width=x1-x0, height=y1-y0)
 
 		def draw_black_key(key):
 			""" key is the white key that this is the flat of """
@@ -91,13 +103,15 @@ class GUI:
 
 			#self.canvas.create_rectangle(x0, y0, x1, y1, outline="grey", fill="#%06x" % (color))
 			#self.canvas.create_text(x0 + (x1-x0)/2, y0 + 5 + (y1-y0), text=note, fill="blue")
-			active_color = avg_color(avg_color(color, 0xFFFFFF), 0xFFFFFF)
-			button = Button(self.canvas, 
+
+			active_color = avg_color(color, 0xFFFFFF)
+			self.keys[note] = Button(self.canvas, 
 				highlightbackground="grey", bg="#%06x" % (color),
 				highlightcolor="grey", activebackground="#%06x" % (active_color),
+				disabledforeground="#%06x" % (color), # kludge to store it
 				borderwidth=1, highlightthickness=0,
 				command=lambda : self.press_key(note))
-			button.place(x=x0, y=y0, width=x1-x0, height=y1-y0)
+			self.keys[note].place(x=x0, y=y0, width=x1-x0, height=y1-y0)
 
 		max = int(math.ceil(len(G.note_from_stair) / G.STEPS_PER_FLIGHT))
 		flights = [ G.note_from_stair[i * G.STEPS_PER_FLIGHT : (i + 1) * G.STEPS_PER_FLIGHT] for i in range(0, max) ]
@@ -146,8 +160,15 @@ class GUI:
 	
 		self.demo_button = IntVar()
 		self.demo_button.set(0)
+		def toggle_demo():
+			if self.demo_button.get():
+				parser.playsong('copeland.score')
+			else:
+				self.draw_keyboard() # reset any active buttons
+				#TODO: kill thread
+
 		demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
-			command=lambda: parser.playsong('copeland.score'))
+			command=toggle_demo)
 		demo.pack(side=LEFT)
 		
 		#Volume control	

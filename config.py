@@ -2,7 +2,7 @@
 NSTAIRS = 32
 STEPS_PER_FLIGHT = 16
 SOUNDS_DIR = 'sounds'
-DEBUG = 1
+DEBUG = 0
 
 # Globals. Don't modify these directly.  set_(key|instrument) and power_(on|off) run additional checks and/or do stuff.
 instrument = 'piano'

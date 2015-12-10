@@ -52,12 +52,14 @@ def playsong_aux(fname):
 				for tone in prev_tones:
 					if ('~' + tone) not in tones:
 						player.sound_stop(tone)
+						G.gui.key_up(tone)
 
 				# Play this set
 				for (i, tone) in enumerate(tones):
 					if ('~' != tone[0]):
 						# If it's a tie, we don't start it over
 						player.sound_play(tone)
+						G.gui.key_down(tone)
 					else:
 						tones[i] = tone[1:len(tone)] # prev_tones won't care if it was already a tie
 
@@ -82,5 +84,6 @@ def playsong_aux(fname):
 
 def playsong(fname):
 	t = threading.Thread(target=playsong_aux, args=(fname,))
+	t.daemon = 1 # Setting it as a daemon causes it to *not* stay alive in the background
 	t.start()
 
