@@ -2,14 +2,11 @@ import config as G, player, threading, collections, math, sys, parser, pygame
 from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
-	
-#def close_window():
-#	sys.exit()
 
 class GUI:
-	MAX_MESSAGES = 64
-	PIANO_WIDTH = 1020
-	PIANO_HEIGHT = PIANO_WIDTH / 10.625
+	MAX_MESSAGES = 1024 # Fine if it's large, but it should be finite to avoid running out of memory
+	PIANO_WIDTH = 0
+	PIANO_HEIGHT = 0
 	PIANO_BORDER = 10
 	keys = {}
 
@@ -123,39 +120,50 @@ class GUI:
 		black_key_width = white_key_width * 0.55
 		black_key_height = self.PIANO_HEIGHT * 0.55
 
-		self.canvas.delete("all")
+		# The actual border size will vary a bit, since white_key_width is restricted to integers.
+		# This is preferable to what it looks like otherwise
+		self.canvas.destroy()
+		self.canvas = Canvas(self.frame, 
+			height = self.PIANO_HEIGHT + 2 * self.PIANO_BORDER,
+			width = self.PIANO_WIDTH)
+		self.canvas.pack(side=BOTTOM)
 		for key in range (0, 52): draw_white_key(key)
 		for key in range (1, 52): draw_black_key(key)
 	
+	def resize(self, event):
+		self.PIANO_WIDTH = self.win.winfo_width() - 2 * self.PIANO_BORDER
+		self.PIANO_HEIGHT = self.PIANO_WIDTH / 10.625
+		self.draw_keyboard()
+
 	def __init__(self):
 		def update_settings():
 			player.set_instrument(self.selected_instrument.get())
 			player.set_key(selected_key.get(), use_accidentals.get())
-			self.draw_keyboard()
+			self.resize(None)
 
 		def toggle_power():
 			if (mute_button.get()):
-				player.system_on()
+				player.sound_on()
 			else:
-				player.system_off()
+				player.sound_off()
 
 		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
 		self.win = Tk()
-		self.win.minsize(240, 320)
+		if G.DISABLE_CLOSE_BUTTON: self.win.overrideredirect(1)
+		self.win.attributes('-fullscreen', 1)
+		self.win.minsize(640, 540)
 		self.frame = Frame(self.win)
 		self.frame.pack(fill=BOTH, expand=1)
-		#self.win.protocol('WM_DELETE_WINDOW', close_window)
 		self.win.title('pianostairs')
-
 	
 		buttons = Frame(self.frame)
-		buttons.pack(fill=BOTH)
+		buttons.pack(side=TOP, fill=X)
 
 		mute_button = IntVar()
 		mute_button.set(0)
 
 		mute = Checkbutton(master=buttons, text=' Mute ', indicatoron=0, var=mute_button,
-			command=lambda: player.system_off() if mute_button.get() else player.system_on())
+			command=lambda: player.sound_off() if mute_button.get() else player.sound_on())
 		mute.pack(side=LEFT)
 	
 		self.demo_button = IntVar()
@@ -165,7 +173,6 @@ class GUI:
 				parser.playsong('copeland.score')
 			else:
 				self.draw_keyboard() # reset any active buttons
-				#TODO: kill thread
 
 		demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
 			command=toggle_demo)
@@ -184,9 +191,8 @@ class GUI:
 		Label(vol_frame, textvariable=volume, width=4).pack(side=LEFT)
 		vol_frame.pack(side=RIGHT)
 
-
 		self.output = ScrolledText(self.frame)
-		self.output.pack(fill=BOTH)
+		self.output.pack(fill=BOTH, expand = 1)
 
 		# Menu
 		menu = Menu(self.frame)
@@ -211,10 +217,8 @@ class GUI:
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)
 		
-
-		self.canvas = Canvas(height = self.PIANO_HEIGHT + 2 * self.PIANO_BORDER, 
-			width=self.PIANO_WIDTH + 2 * self.PIANO_BORDER)
-		self.canvas.pack(expand = YES, fill = BOTH)
+		self.frame.bind('<Configure>', self.resize)
+		self.canvas = Canvas(self.frame)
 
 		self.win.config(menu=menu)
 		update_settings()

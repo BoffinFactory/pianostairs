@@ -4,7 +4,7 @@ def get_sound_file(instrument, note):
 	return G.SOUNDS_DIR + '/' + instrument + '-' + note + '.wav'
 
 def sound_play(note):
-	if not G.power: return
+	if G.mute: return
 
 	fname = get_sound_file(G.instrument, note)
 	if not os.path.isfile(fname):
@@ -23,7 +23,7 @@ def sound_stop(note):
 	G.debug("stop channel %d" % (G.index_from_note[note]))
 
 def stair_down(stair_num):
-	if not G.power: return
+	if G.mute: return
 	note = G.note_from_stair[stair_num]
 	G.gui.key_down(note)
 	sound_play(note)
@@ -69,11 +69,11 @@ def set_instrument(name):
 
 
 # Should be possible to enable or disable the entire thing
-def system_on():
-	G.power = 1
+def sound_on():
+	G.mute = 0
 
-def system_off():
-	G.power = 0
+def sound_off():
+	G.mute = 1
 	pygame.mixer.stop()
 
 def play_song(fname):
