@@ -19,6 +19,9 @@ def playsong_aux(fname):
 			line = infile.readline()
 			if ('' == line):
 				pygame.mixer.stop()
+				# turn itself off gui-side
+				G.gui.demo_button.set(0)
+				G.gui.draw_keyboard()
 				return None
 		elif re.match(r'#', line):
 			G.debug(line)
