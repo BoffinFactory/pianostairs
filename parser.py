@@ -39,6 +39,10 @@ def playsong_aux(fname):
 			matches = re.match(r'\\instrument (.*)', line)
 			player.set_instrument(matches.group(1))
 			line = '' # instruments can have spaces, so this command always uses the entire line
+		elif re.match(r'\\key (.*)', line):
+			matches = re.match(r'\\key (.*)', line)
+			player.set_key(matches.group(1), 0)
+			line = '' # instruments can have spaces, so this command always uses the entire line
 		elif re.match(r'\(([~A-G0-8b ]*)\)([1-9][0-9]*\.?)(.*)', line): 
 			matches = re.match(r'\(([~A-G0-8b ]*)\)([1-9][0-9]*\.?)(.*)', line)
 			# Does admit a few notes that aren't on the keyboard, like G8, but those will get caught by sound_play()

@@ -3,6 +3,7 @@
 
 #measure 1
 \tempo 52
+\key Bb
 \instrument timpani
 #timing adjusted a bit to avoid abrupt stops
 (F2 Bb2)4. ()8 (F2 Bb2)8 (F2 Bb2)2 ()8

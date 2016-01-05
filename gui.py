@@ -138,7 +138,7 @@ class GUI:
 	def __init__(self):
 		def update_settings():
 			player.set_instrument(self.selected_instrument.get())
-			player.set_key(selected_key.get(), use_accidentals.get())
+			player.set_key(self.selected_key.get(), self.use_accidentals.get())
 			self.resize(None)
 
 		def toggle_power():
@@ -201,18 +201,18 @@ class GUI:
 		
 		self.selected_instrument = StringVar()
 		self.selected_instrument.set(G.instrument)
-		selected_key = StringVar()
-		selected_key.set('C')
-		use_accidentals = IntVar()
-		use_accidentals.set(0)
+		self.selected_key = StringVar()
+		self.selected_key.set('C')
+		self.use_accidentals = IntVar()
+		self.use_accidentals.set(0)
 
 		for name in player.list_instruments():
 			menu_instrument.add_radiobutton(label=name, command=update_settings, var=self.selected_instrument)
 	
-		menu_key.add_checkbutton(label='Include Accidentals', command=update_settings, var=use_accidentals)
+		menu_key.add_checkbutton(label='Include Accidentals', command=update_settings, var=self.use_accidentals)
 		menu_key.add_separator()
 		for key in [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']:
-			menu_key.add_radiobutton(label=key, command=update_settings, var=selected_key)
+			menu_key.add_radiobutton(label=key, command=update_settings, var=self.selected_key)
 			
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)

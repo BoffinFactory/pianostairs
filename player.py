@@ -56,6 +56,16 @@ def set_key(key, include_accidentals):
 	G.note_from_stair = notes[min : G.NSTAIRS + min]
 	assert len(G.note_from_stair) == G.NSTAIRS
 
+	if G.gui:
+		G.gui.selected_key.set(key)
+		G.gui.use_accidentals.set(include_accidentals)
+		G.gui.draw_keyboard()
+
+	if include_accidentals:
+		G.output('Include all notes (centered on %s)' % (key))
+	else:
+		G.output('Key = %s' % (key))
+
 def set_instrument(name):
 	# We assume that the files were set up properly, so if C4 exists, the rest do as well
 	fname = get_sound_file(name, 'C4')
