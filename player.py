@@ -68,6 +68,7 @@ def set_key(key, include_accidentals):
 
 def set_instrument(name):
 	# We assume that the files were set up properly, so if C4 exists, the rest do as well
+	name = name.replace(' ', '_')
 	fname = get_sound_file(name, 'C4')
 	if not name in list_instruments():
 		G.error("%s is not a valid instrument" % (name))
@@ -75,7 +76,7 @@ def set_instrument(name):
 
 	G.instrument = name
 	if G.gui: G.gui.selected_instrument.set(G.instrument)
-	G.output('Instrument = ' + G.instrument)
+	G.output('Instrument = ' + G.instrument.replace('_', ' '))
 
 
 # Should be possible to enable or disable the entire thing

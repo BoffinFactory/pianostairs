@@ -207,7 +207,7 @@ class GUI:
 		self.use_accidentals.set(0)
 
 		for name in player.list_instruments():
-			menu_instrument.add_radiobutton(label=name, command=update_settings, var=self.selected_instrument)
+			menu_instrument.add_radiobutton(label=name.replace('_',' '), command=update_settings, var=self.selected_instrument)
 	
 		menu_key.add_checkbutton(label='Include Accidentals', command=update_settings, var=self.use_accidentals)
 		menu_key.add_separator()

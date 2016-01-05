@@ -17,9 +17,14 @@ INSTRUMENTS := \
 	saxophone:baritone_sax \
 	bassoon:bassoon \
 	trumpet:trumpet \
+	clarinet:clarinet \
+	organ:church_organ \
+	tubular_bells:tubular_bells \
 
+# Complete list of notes is { A0 Bb0 B0 C8 } \union (TONES x OCTAVES)
+# i.e. the standard piano keyboard
 TONES := C Db D Eb E F Gb G Ab A Bb B
-OCTAVES := $(shell seq 0 8)
+OCTAVES := $(shell seq 1 7)
 
 # Usage: $(call add-tone instrument tone octave)
 # Sets up all the necessary target-specific variables for this specific note
@@ -43,8 +48,11 @@ instruments += $(instrument)
 all: $(instrument)
 $(instrument): midi_instrument="$(midi)"
 
-$(foreach tone,$(TONES),$(foreach octave,$(OCTAVES),$(call add-tone,$(instrument),$(tone),$(octave))))
+$(foreach tone,A Bb B,$(call add-tone,$(instrument),$(tone),0))
+$(foreach octave,$(OCTAVES),$(foreach tone,$(TONES),$(call add-tone,$(instrument),$(tone),$(octave))))
+$(call add-tone,$(instrument),C,8)
 endef
+
 
 # Needs to appear before the eval, to make it the default
 all:
