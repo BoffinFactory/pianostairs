@@ -20,6 +20,7 @@ def sound_play(note):
 def sound_stop(note):
 	channel = pygame.mixer.Channel(G.index_from_note[note])
 	channel.stop()
+	G.output('Stop %s' % (note))
 	G.debug("stop channel %d" % (G.index_from_note[note]))
 
 def stair_down(stair_num):
