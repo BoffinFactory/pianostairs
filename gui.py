@@ -1,4 +1,4 @@
-import config as G, player, threading, collections, math, sys, parser, pygame
+import config as G, player, threading, collections, math, sys, parser, pygame, challenge
 from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
@@ -129,8 +129,15 @@ class GUI:
 		self.canvas.pack(side=BOTTOM)
 		for key in range (0, 52): draw_white_key(key)
 		for key in range (1, 52): draw_black_key(key)
+
+	def toggle_demo(self):
+		if self.demo_button.get():
+			parser.playsong('copeland.score')
+		else:
+			self.draw_keyboard() # reset any active buttons
 	
 	def resize(self, event):
+		if G.REQUIRE_FULLSCREEN: self.win.attributes('-fullscreen', 1)
 		self.PIANO_WIDTH = self.win.winfo_width() - 2 * self.PIANO_BORDER
 		self.PIANO_HEIGHT = self.PIANO_WIDTH / 10.625
 		self.draw_keyboard()
@@ -149,7 +156,6 @@ class GUI:
 
 		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
 		self.win = Tk()
-		if G.DISABLE_CLOSE_BUTTON: self.win.overrideredirect(1)
 		self.win.attributes('-fullscreen', 1)
 		self.win.minsize(640, 540)
 		self.frame = Frame(self.win)
@@ -168,15 +174,20 @@ class GUI:
 	
 		self.demo_button = IntVar()
 		self.demo_button.set(0)
-		def toggle_demo():
-			if self.demo_button.get():
-				parser.playsong('copeland.score')
-			else:
-				self.draw_keyboard() # reset any active buttons
 
-		demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
-			command=toggle_demo)
-		demo.pack(side=LEFT)
+		self.demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
+			command=self.toggle_demo)
+		self.demo.pack(side=LEFT)
+
+		#TODO: Need some sort of audio feedback.  Beeps/buzzers/dueling banjos/whatever. may need to add banjo as an instrument
+		#This may be worth bring up a separate modal window on top of the normal one.  Or replacing the normal text box with
+		#a frame
+		#Be sure to disable the demo if it's running
+		#Single or two-player mode. single player just has the AI pick random notes within n stairs of the last
+		self.challenge_button = IntVar()
+		challenge_mode = Checkbutton(master=buttons, text=' Challenge Mode ', indicatoron=0, var=self.challenge_button,
+			command=lambda: self.challenge.start() if self.challenge_button.get() else self.challenge.stop())
+		challenge_mode.pack(side=LEFT)
 		
 		#Volume control	
 		vol_frame = Frame(buttons)
@@ -193,6 +204,9 @@ class GUI:
 
 		self.output = ScrolledText(self.frame)
 		self.output.pack(fill=BOTH, expand = 1)
+	
+		self.challenge_frame = Frame(self.frame)
+		self.challenge = challenge.Challenge(self.challenge_frame)
 
 		# Menu
 		menu = Menu(self.frame)
@@ -213,6 +227,7 @@ class GUI:
 		menu_key.add_separator()
 		for key in [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']:
 			menu_key.add_radiobutton(label=key, command=update_settings, var=self.selected_key)
+
 			
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)

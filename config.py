@@ -1,10 +1,10 @@
 # Constants
-NSTAIRS = 16
-STEPS_PER_FLIGHT = 16
+NSTAIRS = 32
+STEPS_PER_FLIGHT = 8
 SOUNDS_DIR = 'sounds'
-DEBUG = 1
-DISABLE_CLOSE_BUTTON = 0
+DEBUG = 0
 ACTIVE_LOW = 1
+REQUIRE_FULLSCREEN = 1
 
 # Globals. Don't modify these directly.  set_(key|instrument) and sound_(on|off) run additional checks and/or do stuff.
 instrument = 'piano'

@@ -12,6 +12,7 @@
 * Scrolled Text
 * PIL
 * pygame
+* pyserial
 
 ###Building
 $ make  
