@@ -2,7 +2,7 @@
 
   (general
     (links 14)
-    (no_connects 1)
+    (no_connects 0)
     (area 149.01156 96.665 170.667 117.550001)
     (thickness 1.6)
     (drawings 4)
@@ -64,7 +64,7 @@
     (aux_axis_origin 0 0)
     (visible_elements FFFFFF7F)
     (pcbplotparams
-      (layerselection 0x01030_80000001)
+      (layerselection 0x010f0_80000001)
       (usegerberextensions false)
       (excludeedgelayer true)
       (linewidth 0.100000)
@@ -227,7 +227,7 @@
   (module PD70:TC33 (layer F.Cu) (tedit 56983473) (tstamp 569897C1)
     (at 153.035 101.6 180)
     (path /56980A4A)
-    (fp_text reference RV1 (at 0 3.81 180) (layer F.SilkS)
+    (fp_text reference RV1 (at -2.8194 -0.4572 180) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value POT (at 0 -3.81 180) (layer F.Fab) hide
@@ -276,7 +276,7 @@
     (descr "Through hole socket strip")
     (tags "socket strip")
     (path /56BCF8BB)
-    (fp_text reference P1 (at 0 -5.1 270) (layer F.SilkS)
+    (fp_text reference P1 (at -2.921 0.1016 270) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value CONN_01X05 (at 0 -3.1 270) (layer F.Fab)
