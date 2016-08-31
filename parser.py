@@ -11,7 +11,7 @@ def playsong_aux(fname):
 	prev_tones = []
 	line = ''
 
-	while G.gui and G.gui.demo_button.get():
+	while G.gui and G.gui.button_demo.get():
 		line = line.strip()
 		#G.output('parse line: "%s"' % (line))
 
@@ -20,7 +20,7 @@ def playsong_aux(fname):
 			if ('' == line):
 				pygame.mixer.stop()
 				# turn itself off gui-side
-				G.gui.demo_button.set(0)
+				G.gui.buttom_demo.set(0)
 				G.gui.draw_keyboard()
 				return None
 		elif re.match(r'#', line):

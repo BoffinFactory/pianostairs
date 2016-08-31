@@ -88,20 +88,19 @@ def sound_off():
 	G.mute = 1
 	pygame.mixer.stop()
 
-def play_song(fname):
-	# easter egg: override the normal working and play a full song
-	pass
-
 def list_instruments():
 	lst = list(set([ fname.split('-')[0] for fname in os.listdir(G.SOUNDS_DIR) ]))
 	lst.sort()
 	return lst
 
 def init():
-	pygame.mixer.pre_init(44100, -16, 2, 2048)
-	pygame.mixer.init()
-	pygame.mixer.set_num_channels(88)
-	pygame.init()
+	try:
+		pygame.mixer.pre_init(44100, -16, 2, 2048)
+		pygame.mixer.init()
+		pygame.mixer.set_num_channels(88)
+		pygame.init()
+	except:
+		pass
 
 	arr = [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B' ]
 	allnotes = ["%s%d" % (note,octave) 

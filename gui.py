@@ -3,6 +3,23 @@ from ScrolledText import ScrolledText
 from Tkinter import *
 from  PIL import Image, ImageTk
 
+def ternary(expr, expr0, expr1):
+	if expr: return expr0
+	else: return expr1
+
+class ToggleButton:
+	def __init__(self, parent, label, callback):
+		self.var = IntVar()
+		self.var.set(0)
+		self.button = Checkbutton(master=parent, text=label, indicatoron=0, var=self.var, command=callback)
+		self.button.pack(side=LEFT)
+
+	def set(self, n):
+		self.var.set(n)
+
+	def get(self):
+		return self.var.get()
+
 class GUI:
 	MAX_MESSAGES = 1024 # Fine if it's large, but it should be finite to avoid running out of memory
 	PIANO_WIDTH = 0
@@ -131,7 +148,7 @@ class GUI:
 		for key in range (1, 52): draw_black_key(key)
 
 	def toggle_demo(self):
-		if self.demo_button.get():
+		if self.button_demo.get():
 			parser.playsong('copeland.score')
 		else:
 			self.draw_keyboard() # reset any active buttons
@@ -148,12 +165,6 @@ class GUI:
 			player.set_key(self.selected_key.get(), self.use_accidentals.get())
 			self.resize(None)
 
-		def toggle_power():
-			if (mute_button.get()):
-				player.sound_on()
-			else:
-				player.sound_off()
-
 		self.messages = collections.deque(maxlen=self.MAX_MESSAGES)
 		self.win = Tk()
 		self.win.attributes('-fullscreen', 1)
@@ -165,29 +176,20 @@ class GUI:
 		buttons = Frame(self.frame)
 		buttons.pack(side=TOP, fill=X)
 
-		mute_button = IntVar()
-		mute_button.set(0)
-
-		mute = Checkbutton(master=buttons, text=' Mute ', indicatoron=0, var=mute_button,
-			command=lambda: player.sound_off() if mute_button.get() else player.sound_on())
-		mute.pack(side=LEFT)
+		self.button_mute = ToggleButton(buttons, ' Mute ',
+			lambda: player.sound_off() if self.button_mute.get() else player.sound_on())
 	
-		self.demo_button = IntVar()
-		self.demo_button.set(0)
-
-		self.demo = Checkbutton(master=buttons, text=' Demo ', indicatoron=0, var=self.demo_button,
-			command=self.toggle_demo)
-		self.demo.pack(side=LEFT)
+		self.button_demo = ToggleButton(buttons, ' Demo ', self.toggle_demo)
 
 		#TODO: Need some sort of audio feedback.  Beeps/buzzers/dueling banjos/whatever. may need to add banjo as an instrument
 		#This may be worth bring up a separate modal window on top of the normal one.  Or replacing the normal text box with
 		#a frame
 		#Be sure to disable the demo if it's running
 		#Single or two-player mode. single player just has the AI pick random notes within n stairs of the last
-		self.challenge_button = IntVar()
-		challenge_mode = Checkbutton(master=buttons, text=' Challenge Mode ', indicatoron=0, var=self.challenge_button,
-			command=lambda: self.challenge.start() if self.challenge_button.get() else self.challenge.stop())
-		challenge_mode.pack(side=LEFT)
+		self.button_challenge = ToggleButton(buttons, ' Challenge Mode ', 
+		#	lambda: self.challenge.start() if self.button_challenge.get() else self.challenge.stop())
+		#	lambda: [ self.challenge.stop, self.challenge.start ][self.button_challenge.get()]() )
+			lambda: ternary(self.button_challenge.get(), self.challenge.start, self.challenge.stop)())
 		
 		#Volume control	
 		vol_frame = Frame(buttons)
@@ -213,22 +215,25 @@ class GUI:
 		menu_instrument = Menu(menu, tearoff=0)
 		menu_key = Menu(menu, tearoff=0)
 		
+
+		# instrument
 		self.selected_instrument = StringVar()
 		self.selected_instrument.set(G.instrument)
-		self.selected_key = StringVar()
-		self.selected_key.set('C')
-		self.use_accidentals = IntVar()
-		self.use_accidentals.set(0)
-
 		for name in player.list_instruments():
 			menu_instrument.add_radiobutton(label=name.replace('_',' '), command=update_settings, var=self.selected_instrument)
 	
+		# accidentals
+		self.use_accidentals = IntVar()
+		self.use_accidentals.set(0)
 		menu_key.add_checkbutton(label='Include Accidentals', command=update_settings, var=self.use_accidentals)
 		menu_key.add_separator()
+		
+		# key
+		self.selected_key = StringVar()
+		self.selected_key.set('C')
 		for key in [ 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']:
 			menu_key.add_radiobutton(label=key, command=update_settings, var=self.selected_key)
-
-			
+		
 		menu.add_cascade(label='Instrument', menu=menu_instrument)
 		menu.add_cascade(label='Key', menu=menu_key)
 		
