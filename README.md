@@ -1,20 +1,24 @@
-# pianostairs
-Pianostairs
-===============
+## pianostairs
 
-A generic makefile for starting projects
+###Dependencies
 
-#Overview:
-* Bullet Points of stuff people need to know
+####Programs
+* lilypond (For generating sound files)
+* timidity (For generating sound files)
+* python
 
-#How to use:
-* Bullet points of how to use the stuff
+####Python modules
+* Tkinter
+* Scrolled Text
+* PIL
+* pygame
 
-Should probably have other content in this section too
+###Building
+$ make  
+It'll generate the necessary sound files in ./sounds/
 
-#Another Heading:
-* Bullet point
+If python doesn't live at /usr/bin/python, adjust the shebang in main.py
 
-words here
+###Running
+$ ./main.py
 
-#Thanks to:
